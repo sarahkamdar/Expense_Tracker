@@ -1,116 +1,188 @@
-import React, { useContext, useState } from "react";
-import axios from "axios";
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { useAuth } from './authContext';
+import axios from 'axios';
 
-const BASE_URL = "http://localhost:5000/api/v1/";
+const GlobalContext = createContext();
 
-const GlobalContext = React.createContext();
+// Create axios instance with default config
+const api = axios.create({
+    baseURL: 'http://localhost:5000/api/v1',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+// Add request interceptor to add token to all requests
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = token;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+const AppReducer = (state, action) => {
+    switch (action.type) {
+        case 'ADD_INCOME':
+            return {
+                ...state,
+                incomes: [...state.incomes, action.payload]
+            };
+        case 'ADD_EXPENSE':
+            return {
+                ...state,
+                expenses: [...state.expenses, action.payload]
+            };
+        case 'DELETE_INCOME':
+            return {
+                ...state,
+                incomes: state.incomes.filter(income => income._id !== action.payload)
+            };
+        case 'DELETE_EXPENSE':
+            return {
+                ...state,
+                expenses: state.expenses.filter(expense => expense._id !== action.payload)
+            };
+        case 'SET_INCOMES':
+            return {
+                ...state,
+                incomes: action.payload
+            };
+        case 'SET_EXPENSES':
+            return {
+                ...state,
+                expenses: action.payload
+            };
+        case 'SET_SELECTED_TRANSACTION':
+            return {
+                ...state,
+                selectedTransaction: action.payload
+            };
+        default:
+            return state;
+    }
+};
 
 export const GlobalProvider = ({ children }) => {
-    const [incomes, setIncomes] = useState([]);
-    const [expenses, setExpenses] = useState([]);
-    const [error, setError] = useState(null);
+    const [state, dispatch] = useReducer(AppReducer, {
+        incomes: [],
+        expenses: [],
+        selectedTransaction: null
+    });
 
-    // Add Income
     const addIncome = async (income) => {
         try {
-            const response = await axios.post(`${BASE_URL}add-income`, income);
-            getIncomes(); // Refresh incomes after adding
-        } catch (err) {
-            setError(err.response?.data?.message || 'An error occurred');
+            const response = await api.post('/add-income', income);
+            dispatch({ type: 'ADD_INCOME', payload: response.data });
+        } catch (error) {
+            console.error('Error adding income:', error);
+            throw error;
         }
     };
 
-    // Get Incomes
-    const getIncomes = async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}get-incomes`);
-            setIncomes(response.data);
-        } catch (err) {
-            setError(err.response?.data?.message || 'An error occurred');
-        }
-    };
-
-    // Delete Income
-    const deleteIncome = async (id) => {
-        try {
-            await axios.delete(`${BASE_URL}delete-income/${id}`);
-            getIncomes(); // Refresh incomes after deletion
-        } catch (err) {
-            setError(err.response?.data?.message || "An error occurred");
-        }
-    };
-
-    // Calculate Total Income
-    const totalIncome = () => {
-        return incomes.reduce((total, income) => total + income.amount, 0);
-    };
-
-    // Add Expense
     const addExpense = async (expense) => {
         try {
-            const response = await axios.post(`${BASE_URL}add-expense`, expense);
-            getExpenses(); // Refresh expenses after adding
-        } catch (err) {
-            setError(err.response?.data?.message || "An error occurred");
+            const response = await api.post('/add-expense', expense);
+            dispatch({ type: 'ADD_EXPENSE', payload: response.data });
+        } catch (error) {
+            console.error('Error adding expense:', error);
+            throw error;
         }
     };
 
-    // Get Expenses
-    const getExpenses = async () => {
+    const deleteIncome = async (id) => {
         try {
-            const response = await axios.get(`${BASE_URL}get-expenses`);
-            setExpenses(response.data);
-        } catch (err) {
-            setError(err.response?.data?.message || "An error occurred");
+            await api.delete(`/delete-income/${id}`);
+            dispatch({ type: 'DELETE_INCOME', payload: id });
+        } catch (error) {
+            console.error('Error deleting income:', error);
+            throw error;
         }
     };
 
-    // Delete Expense
     const deleteExpense = async (id) => {
         try {
-            await axios.delete(`${BASE_URL}delete-expense/${id}`);
-            getExpenses(); // Refresh expenses after deletion
-        } catch (err) {
-            setError(err.response?.data?.message || "An error occurred");
+            await api.delete(`/delete-expense/${id}`);
+            dispatch({ type: 'DELETE_EXPENSE', payload: id });
+        } catch (error) {
+            console.error('Error deleting expense:', error);
+            throw error;
         }
     };
 
-    // Calculate Total Expenses
-    const totalExpenses = () => {
-        return expenses.reduce((total, expense) => total + expense.amount, 0);
+    const getIncomes = async () => {
+        try {
+            const response = await api.get('/get-incomes');
+            dispatch({ type: 'SET_INCOMES', payload: response.data });
+        } catch (error) {
+            console.error('Error fetching incomes:', error);
+            throw error;
+        }
     };
 
-    // Calculate Total Balance
+    const getExpenses = async () => {
+        try {
+            const response = await api.get('/get-expenses');
+            dispatch({ type: 'SET_EXPENSES', payload: response.data });
+        } catch (error) {
+            console.error('Error fetching expenses:', error);
+            throw error;
+        }
+    };
+
+    const totalIncome = () => {
+        return state.incomes.reduce((acc, income) => acc + income.amount, 0);
+    };
+
+    const totalExpenses = () => {
+        return state.expenses.reduce((acc, expense) => acc + expense.amount, 0);
+    };
+
     const totalBalance = () => {
         return totalIncome() - totalExpenses();
     };
 
-    // Get Transaction History
     const transactionHistory = () => {
-        const history = [...incomes, ...expenses];
-        history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        return history.slice(0, 3);
+        const history = [...state.incomes, ...state.expenses];
+        history.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return history;
     };
 
+    const setSelectedTransaction = (transaction) => {
+        dispatch({ type: 'SET_SELECTED_TRANSACTION', payload: transaction });
+    };
+
+    // Load initial data when component mounts
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            getIncomes();
+            getExpenses();
+        }
+    }, []);
+
     return (
-        <GlobalContext.Provider
-            value={{
-                addIncome,
-                getIncomes,
-                incomes,
-                deleteIncome,
-                expenses,
-                totalIncome,
-                addExpense,
-                getExpenses,
-                deleteExpense,
-                totalExpenses,
-                totalBalance,
-                transactionHistory,
-                error,
-                setError,
-            }}
-        >
+        <GlobalContext.Provider value={{
+            incomes: state.incomes,
+            expenses: state.expenses,
+            selectedTransaction: state.selectedTransaction,
+            addIncome,
+            addExpense,
+            deleteIncome,
+            deleteExpense,
+            getIncomes,
+            getExpenses,
+            totalIncome,
+            totalExpenses,
+            totalBalance,
+            transactionHistory,
+            setSelectedTransaction
+        }}>
             {children}
         </GlobalContext.Provider>
     );

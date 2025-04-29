@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useGlobalContext } from '../context/globalContext';
+import { dateFormat } from '../utils/dateFormat';
 
 function History() {
     const {transactionHistory} = useGlobalContext()
@@ -11,22 +12,20 @@ function History() {
         <HistoryStyled>
             <h2>Recent History</h2>
             {history.map((item) =>{
-                const {_id, title, amount, type} = item
+                const {_id, title, amount, type, date} = item
                 return (
                     <div key={_id} className="history-item">
-                        <p style={{
-                            color: type === 'expense' ? 'red' : 'var(--color-green)'
-                        }}>
-                            {title}
-                        </p>
-
-                        <p style={{
-                            color: type === 'expense' ? 'red' : 'var(--color-green)'
-                        }}>
-                            {
-                                type === 'expense' ? `-${amount <= 0 ? 0 : amount}` : `+${amount <= 0 ? 0: amount}`
-                            }
-                        </p>
+                        <div className="content">
+                            <div className="inner-content">
+                                <h5>{title}</h5>
+                                <div className="text">
+                                    <p>{dateFormat(date)}</p>
+                                    <p>
+                                        {type === 'expense' ? '-' : '+'}${amount}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )
             })}
@@ -47,6 +46,33 @@ const HistoryStyled = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
+        .content {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+            .inner-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: .3rem;
+                h5 {
+                    font-size: 1.1rem;
+                    color: #222260;
+                }
+                .text {
+                    display: flex;
+                    align-items: center;
+                    gap: 1.5rem;
+                    p {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        color: #222260;
+                        opacity: 0.8;
+                    }
+                }
+            }
+        }
     }
 `;
 

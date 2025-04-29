@@ -1,35 +1,50 @@
 import React, { useState } from 'react';
-import { auth } from '../firebaseConfig';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import axios from 'axios';
+import { useAuth } from '../context/authContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, googleAuth } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
 
     try {
-        const response = await axios.post('http://localhost:5000/api/v1/auth/login', { email, password });
-        localStorage.setItem('token', `Bearer ${response.data.token}`); // Store the token with "Bearer" prefix
+      const result = await login(email, password);
+      if (result.success) {
         navigate('/dashboard');
-    } catch (error) {
-        console.error(error);
-        alert(error.response?.data?.message || 'An error occurred');
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('An error occurred during login');
+    } finally {
+      setLoading(false);
     }
-};
+  };
 
   const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
+    setError('');
+    setLoading(true);
+
     try {
-      await signInWithPopup(auth, provider);
-      navigate('/');
-    } catch (error) {
-      console.error(error);
+      const result = await googleAuth();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,16 +58,25 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
+            disabled={loading}
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
+            disabled={loading}
           />
-          <button type="submit">Login</button>
+          {error && <p className="error-message">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
-        <button onClick={handleGoogleLogin} className="google-login">
+        <button 
+          onClick={handleGoogleLogin} 
+          className="google-login"
+          disabled={loading}
+        >
           Login with Google
         </button>
         <p>
@@ -76,6 +100,8 @@ const LoginStyled = styled.div`
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    width: 100%;
+    max-width: 400px;
 
     h2 {
       margin-bottom: 1rem;
@@ -90,6 +116,12 @@ const LoginStyled = styled.div`
         padding: 0.8rem;
         border: 1px solid #ccc;
         border-radius: 5px;
+        font-size: 1rem;
+
+        &:disabled {
+          background: #f5f5f5;
+          cursor: not-allowed;
+        }
       }
 
       button {
@@ -99,13 +131,34 @@ const LoginStyled = styled.div`
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+
+        &:hover:not(:disabled) {
+          background: #3a9600;
+        }
       }
+    }
+
+    .error-message {
+      color: #ff4444;
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
     }
 
     .google-login {
       margin-top: 1rem;
       background: #4285f4;
       color: white;
+
+      &:hover:not(:disabled) {
+        background: #357abd;
+      }
     }
 
     p {
@@ -113,6 +166,11 @@ const LoginStyled = styled.div`
       span {
         color: #42ad00;
         cursor: pointer;
+        font-weight: 500;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }

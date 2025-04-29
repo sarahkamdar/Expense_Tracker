@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import styled from 'styled-components'
+import React, { useEffect } from 'react';
+import styled from 'styled-components';
 import { useGlobalContext } from '../../context/globalContext';
 import History from '../../History/History';
 import { InnerLayout } from '../../styles/Layouts';
@@ -7,12 +7,20 @@ import { dollar } from '../../utils/Icons';
 import Chart from '../Chart/Chart';
 
 function Dashboard() {
-    const {totalExpenses,incomes, expenses, totalIncome, totalBalance, getIncomes, getExpenses } = useGlobalContext()
+    const {
+        totalExpenses,
+        incomes,
+        expenses,
+        totalIncome,
+        totalBalance,
+        getIncomes,
+        getExpenses,
+    } = useGlobalContext();
 
     useEffect(() => {
-        getIncomes()
-        getExpenses()
-    }, [])
+        getIncomes();
+        getExpenses();
+    }, []);
 
     return (
         <DashboardStyled>
@@ -24,21 +32,21 @@ function Dashboard() {
                         <div className="amount-con">
                             <div className="income">
                                 <h2>Total Income</h2>
-                                <p>
-                                    {dollar} {totalIncome()}
-                                </p>
+                                <div className="money">
+                                    <p>{dollar} {totalIncome()}</p>
+                                </div>
                             </div>
                             <div className="expense">
-                                <h2>Total Expense</h2>
-                                <p>
-                                    {dollar} {totalExpenses()}
-                                </p>
+                                <h2>Total Expenses</h2>
+                                <div className="money">
+                                    <p>{dollar} {totalExpenses()}</p>
+                                </div>
                             </div>
                             <div className="balance">
                                 <h2>Total Balance</h2>
-                                <p>
-                                    {dollar} {totalBalance()}
-                                </p>
+                                <div className="money">
+                                    <p>{dollar} {totalBalance()}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -66,86 +74,183 @@ function Dashboard() {
                 </div>
             </InnerLayout>
         </DashboardStyled>
-    )
+    );
 }
 
 const DashboardStyled = styled.div`
+    height: 100vh;
+    overflow: hidden;
+    padding: 1rem;
+    margin: 0;
+    background: #f9f9f9;
+    width: calc(100% - 300px);
+    margin-left: 300px;
+    position: fixed;
+    top: 0;
+    right: 0;
+
+    @media screen and (max-width: 768px) {
+        width: 100%;
+        margin-left: 0;
+        padding: 0.5rem;
+        position: relative;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+        font-weight: bold;
+        color: #333;
+    }
+
     .stats-con {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: 2fr 1fr;
         gap: 2rem;
-        overflow-x: auto;
-        max-width: 100%;
-        padding-bottom: 1rem;
+        padding: 1rem;
+        width: 100%;
+        height: calc(100vh - 150px);
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 0;
+        }
+
+        @media screen and (max-width: 1024px) {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            height: auto;
+        }
 
         .chart-con {
-            grid-column: 1 / 4;
-            height: 400px;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+
+            @media screen and (max-width: 1024px) {
+                height: auto;
+            }
+
             .amount-con {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 2rem;
-                margin-top: 2rem;
-                .income, .expense {
-                    grid-column: span 2;
-                }
-                .income, .expense, .balance {
-                    background: #FCF6F9;
-                    border: 2px solid #FFFFFF;
-                    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                    border-radius: 20px;
-                    padding: 1rem;
-                    p {
-                        font-size: 3.5rem;
-                        font-weight: 700;
-                    }
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                margin-top: 1rem;
+
+                @media screen and (max-width: 768px) {
+                    grid-template-columns: 1fr;
                 }
 
-                .balance {
-                    grid-column: 2 / 4;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
+                div {
+                    text-align: center;
+                    background: #fcf6f9;
+                    border: 2px solid #ffffff;
+                    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
+                    border-radius: 20px;
+                    padding: 1.5rem;
+                    transition: transform 0.3s ease;
+
+                    &:hover {
+                        transform: translateY(-5px);
+                    }
+
+                    &.income {
+                        background: #e6f7e6;
+                        border-color: #42ad00;
+                    }
+
+                    &.expense {
+                        background: #fff5f5;
+                        border-color: #e74c3c;
+                    }
+
+                    &.balance {
+                        background: #f0f7ff;
+                        border-color: #3498db;
+                    }
+
+                    h2 {
+                        font-size: clamp(1rem, 1.5vw, 1.2rem);
+                        color: #555;
+                        margin-bottom: 0.5rem;
+                    }
+
                     p {
-                        color: var(--color-green);
-                        opacity: 0.6;
-                        font-size: 4.5rem;
+                        font-size: clamp(1.2rem, 2vw, 1.5rem);
+                        font-weight: bold;
+                        color: #333;
                     }
                 }
             }
         }
 
         .history-con {
-            grid-column: 4 / -1;
-            h2 {
-                margin: 1rem 0;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                width: 0;
             }
+
+            @media screen and (max-width: 1024px) {
+                height: auto;
+            }
+
             .salary-title {
-                font-size: 1.2rem;
+                font-size: clamp(1rem, 1.5vw, 1.2rem);
+                margin: 1.5rem 0;
+                color: #555;
+                display: flex;
+                justify-content: space-between;
+
                 span {
-                    font-size: 1.8rem;
+                    color: #42ad00;
+                    font-weight: bold;
                 }
             }
+
             .salary-item {
-                background: #FCF6F9;
-                border: 2px solid #FFFFFF;
+                background: #fcf6f9;
+                border: 2px solid #ffffff;
                 box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
                 padding: 1rem;
                 border-radius: 20px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                margin-bottom: 1rem;
+
                 p {
                     font-weight: 600;
-                    font-size: 1.6rem;
+                    font-size: clamp(1.2rem, 2vw, 1.6rem);
                 }
             }
         }
     }
+
+    @media (max-width: 768px) {
+        .stats-con {
+            padding: 0.5rem;
+        }
+
+        .chart-con, .history-con {
+            padding: 1rem;
+        }
+    }
 `;
 
-export default Dashboard
+export default Dashboard;

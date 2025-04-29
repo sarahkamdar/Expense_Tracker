@@ -1,29 +1,62 @@
-export const dashboard = <i className="fa-solid fa-chart-line"></i>
-export const transactions = <i className="fa-solid fa-credit-card"></i>
-export const categories = <i className="fa-solid fa-tags"></i>
-export const accounts = <i className="fa-solid fa-wallet"></i>
-export const settings = <i className="fa-solid fa-cog"></i>
-export const logout = <i className="fa-solid fa-sign-out"></i>
-export const trend = <i className="fa-solid fa-money-bill-trend-up"></i>
-export const expenses = <i className="fa-solid fa-money-bill-transfer"></i>
-export const money = <i className="fa-solid fa-money-bill"></i>
-export const freelance = <i className ="fa-solid fa-earth-americas"></i>
-export const stocks = <i className="fa-solid fa-arrow-trend-up"></i>
-export const bitcoin = <i className="fa-brands fa-bitcoin"></i>
-export const piggy = <i className="fa-solid fa-piggy-bank"></i>
-export const yt = <i className="fa-brands fa-youtube"></i>
-export const card = <i className="fa-brands fa-cc-visa"></i>
-export const users = <i className="fa-solid fa-users-between-lines"></i>
-export const dollar = <i className="fa-solid fa-dollar-sign"></i>
-export const calender = <i className="fa-solid fa-calendar"></i>
-export const comment = <i className="fa-solid fa-comment"></i>
-export const plus = <i className="fa-solid fa-plus"></i>
-export const trash = <i className="fa-solid fa-trash"></i>
-export const signout = <i className="fa-solid fa-right-from-bracket"></i>
-export const takeaway = <i className="fa-solid fa-utensils"></i>
-export const clothing = <i className="fa-solid fa-shirt"></i>
-export const book = <i className="fa-solid fa-book-open"></i>
-export const food = <i className="fa-solid fa-bowl-food"></i>
-export const medical = <i className="fa-solid fa-briefcase-medical"></i>
-export const tv = <i className="fa-solid fa-tv"></i>
-export const circle = <i className="fa-solid fa-circle-dot"></i>
+import { BiMenuAltRight } from 'react-icons/bi';
+import { IoClose } from 'react-icons/io5';
+import { FaPiggyBank } from 'react-icons/fa';
+import { BsCurrencyDollar } from 'react-icons/bs';
+import { IoIosMore } from 'react-icons/io';
+import { FaPlus } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
+import { FaSignOutAlt } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
+import { MdDashboard } from 'react-icons/md';
+import { FaExchangeAlt } from 'react-icons/fa';
+import { FaChartLine } from 'react-icons/fa';
+import { FaWallet } from 'react-icons/fa';
+import { FaCreditCard } from 'react-icons/fa';
+import { FaCalendarAlt } from 'react-icons/fa';
+import { FaCommentDollar } from 'react-icons/fa';
+import { FaShoppingCart } from 'react-icons/fa';
+import { FaBook } from 'react-icons/fa';
+import { FaUtensils } from 'react-icons/fa';
+import { FaHospital } from 'react-icons/fa';
+import { FaTv } from 'react-icons/fa';
+import { FaCircle } from 'react-icons/fa';
+import { FaEye } from 'react-icons/fa';
+import { FaCog } from 'react-icons/fa';
+import { FaList } from 'react-icons/fa';
+import { FaBitcoin } from 'react-icons/fa';
+import { FaChartBar } from 'react-icons/fa';
+import { FaBriefcase } from 'react-icons/fa';
+import { FaYoutube } from 'react-icons/fa';
+
+export const menu = <BiMenuAltRight />;
+export const close = <IoClose />;
+export const piggy = <FaPiggyBank />;
+export const dollar = <BsCurrencyDollar />;
+export const more = <IoIosMore />;
+export const plus = <FaPlus />;
+export const trash = <FaTrash />;
+export const signout = <FaSignOutAlt />;
+export const users = <FaUser />;
+export const dashboard = <MdDashboard />;
+export const transactions = <FaExchangeAlt />;
+export const trend = <FaChartLine />;
+export const expenses = <FaWallet />;
+export const money = <FaCreditCard />;
+export const calender = <FaCalendarAlt />;
+export const comment = <FaCommentDollar />;
+export const takeaway = <FaShoppingCart />;
+export const clothing = <FaBook />;
+export const book = <FaBook />;
+export const food = <FaUtensils />;
+export const medical = <FaHospital />;
+export const tv = <FaTv />;
+export const circle = <FaCircle />;
+export const eye = <FaEye />;
+export const settings = <FaCog />;
+export const categories = <FaList />;
+export const bitcoin = <FaBitcoin />;
+export const stocks = <FaChartBar />;
+export const freelance = <FaBriefcase />;
+export const yt = <FaYoutube />;
+export const accounts = <FaWallet />;
+export const card = <FaCreditCard />;
